@@ -565,6 +565,29 @@ struct Reader {
         set(field, AsukaProp.a11yLabelledBy, .int(0))
         XCTAssertEqual(view(field).accessibilityLabel, "own")
     }
+
+    // MARK: Navigation
+
+    /// A tab's page is built when the tab is first chosen, so its Stack
+    /// comes into a page that's already in the window: it's the page's
+    /// child controller, as one there from the start is once it appears,
+    /// or UIKit throws (UIViewControllerHierarchyInconsistency).
+    func testStackIntoAShownTab() {
+        let r = root()
+        let tabs = make(.tabs)
+        rt.insert(r, child: tabs, index: 0)
+        frame(tabs, vc.view.bounds)
+        let first = make(.screen), second = make(.screen)
+        rt.insert(tabs, child: first, index: 0)
+        rt.insert(tabs, child: second, index: 1)
+        set(tabs, AsukaProp.Tabs.selected, .int(1))
+        window.layoutIfNeeded()
+        waitUntil { view(second).window != nil }
+        let stack = make(.stack)
+        rt.insert(second, child: stack, index: 0)
+        XCTAssertTrue(rt.nodes[stack]!.vc!.parent === rt.nodes[second]!.vc)
+        XCTAssertTrue(view(stack).isDescendant(of: view(second)))
+    }
 }
 
 /// The Keys prop as ops.AppendKeys writes it.

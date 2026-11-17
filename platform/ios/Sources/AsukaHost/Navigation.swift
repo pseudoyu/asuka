@@ -474,7 +474,9 @@ func decodeActions(_ b: UnsafeRawBufferPointer) -> [AsukaAction] { AsukaActions.
             return true
         }
         if let child = c.vc, child is AsukaStackController || child is AsukaTabsController || child is AsukaSplitController {
-            let owner = hostController(of: p) ?? controller
+            // The screen it goes into, if p is one (a tab's page built as
+            // it's first chosen), else the one around p.
+            let owner = p.vc as? AsukaScreenController ?? hostController(of: p) ?? controller
             owner?.addChild(child)
             p.insert(c, at: index)
             child.didMove(toParent: owner)
