@@ -1,0 +1,33 @@
+// A void expression body must keep its async flag: native UI callbacks
+// start a task only for an async closure. Block bodies already do.
+
+state said = ""
+
+async fn save(what: string) {
+  await sleep(1ms)
+  said = "saved {what}"
+}
+
+component Choices {
+  Column {
+    Text(said)
+    Button("More") {
+      menu: [
+        .button(title: "Marked", run: async () => await save("marked")),
+        .button(title: "Inferred", run: () => await save("inferred")),
+      ]
+    }
+  }
+}
+
+app { Choices() }
+
+test "void expression callbacks can suspend" {
+  let app = mount(Choices())
+  app.tap("More")
+  app.tap("Marked")
+  await app.waitFor("saved marked")
+  app.tap("More")
+  app.tap("Inferred")
+  await app.waitFor("saved inferred")
+}

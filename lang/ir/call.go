@@ -1098,7 +1098,7 @@ func (b *fb) lambda(e *syntax.LambdaExpr) int {
 		ft = &check.FuncType{Result: check.Void}
 	}
 	ret := b.l.kind(ft.Result)
-	return b.makeClosure(closure{name: "closure@" + itoa(int(b.l.line(e))), ctxs: []*check.FuncCtx{ctx}, params: ctx.Params, ret: ret, throws: true, body: func(c *fb) {
+	return b.makeClosure(closure{name: "closure@" + itoa(int(b.l.line(e))), ctxs: []*check.FuncCtx{ctx}, params: ctx.Params, ret: ret, async: ctx.Awaits, throws: true, body: func(c *fb) {
 		c.ctx = ctx
 		switch body := e.Body.(type) {
 		case syntax.Expr:
@@ -1111,9 +1111,6 @@ func (b *fb) lambda(e *syntax.LambdaExpr) int {
 		case *syntax.Block:
 			c.block(body)
 			c.ret(-1, ret)
-		}
-		if ctx.Awaits {
-			c.f.Flags |= bc.FAsync
 		}
 	}})
 }
