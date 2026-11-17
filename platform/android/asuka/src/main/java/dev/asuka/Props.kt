@@ -360,10 +360,14 @@ fun AsukaRuntime.propBool(id: Int, prop: Int, v: Boolean) {
                     keepMultiline(n, e)
                 }
                 AsukaProp.TextField.MULTILINE -> setMultiline(n, view as EditText, v)
-                // No box nor underline: the text alone (set once, before it's shown).
+                // Remove the native decoration, then restore the app's style:
+                // its props may have arrived before Plain.
                 AsukaProp.TextField.PLAIN -> if (v) (view as EditText).apply {
                     background = null
                     setPadding(0, 0, 0, 0)
+                    n.basePadding = null
+                    applyBackground(n)
+                    applyContentInset(n)
                 }
             }
             AsukaKind.PROGRESS -> if (prop == AsukaProp.Progress.INDETERMINATE) {

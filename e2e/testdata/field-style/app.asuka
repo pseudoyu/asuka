@@ -1,0 +1,56 @@
+style fieldStyle {
+  width: 240
+  height: 56
+  background: #ffffff
+  radius: 12
+  border: 1.5
+  borderColor: #ccd8e0
+  padding: [12, 14]
+}
+
+component FieldStyle {
+  Column {
+    grow: 1
+    justify: .center
+    align: .center
+    gap: 16
+    background: #f2f4f6
+
+    Text("Field styling")
+    TextField {
+      style: fieldStyle
+      plain: true
+      placeholder: "Style before plain"
+    }
+    TextField {
+      plain: true
+      width: 240
+      height: 56
+      background: #ffffff
+      radius: 12
+      border: 1.5
+      borderColor: #ccd8e0
+      padding: [12, 14]
+      placeholder: "Plain before inline style"
+    }
+    TextField {
+      style: fieldStyle
+      plain: true
+      multiline: true
+      placeholder: "Multiline"
+    }
+    TextField {
+      plain: true
+      width: 240
+      height: 56
+      placeholder: "Plain without style"
+    }
+    TextField {
+      width: 240
+      height: 56
+      placeholder: "Native without style"
+    }
+  }
+}
+
+app { FieldStyle() }
