@@ -1,0 +1,40 @@
+// A button with a menu shows its actions when it's tapped, instead of
+// running on press, as every platform's does (UIButton's
+// showsMenuAsPrimaryAction, Android's PopupMenu, the others' pop-ups):
+// a press handler beside the menu doesn't keep it shut. An empty menu is
+// none.
+
+state said = ""
+
+component Choices {
+  Column {
+    Text("Said: {said}")
+    Button("Attach") {
+      menu: [.button(title: "Take a photo", run: () => { said = "photo" })]
+      on press { said = "pressed" }
+    }
+    Button("Plain") {
+      on press { said = "plain" }
+    }
+    Button("Empty") {
+      menu: []
+      on press { said = "empty" }
+    }
+  }
+}
+
+app { Choices() }
+
+test "a button's menu opens instead of its press" {
+  let app = mount(Choices())
+  app.tap("Attach")
+  app.expect("Take a photo")
+  app.expectNo("Said: pressed")
+  app.tap("Take a photo")
+  app.expect("Said: photo")
+  app.tap("Plain")
+  app.expect("Said: plain")
+  // An empty menu is no menu: the press runs.
+  app.tap("Empty")
+  app.expect("Said: empty")
+}

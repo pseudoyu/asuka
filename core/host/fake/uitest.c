@@ -1158,8 +1158,15 @@ static bool disabled_view(const ak_fake_view *v) {
 	return false;
 }
 
+// has_menu reports whether v has a menu of trigger with items in it: an
+// empty one is none, as on every host.
 static bool has_menu(const ak_fake_view *v, int64_t trigger) {
-	return ak_fake_prop_of(v, AK_PROP_MENU) != NULL && ak_fake_int(v, AK_PROP_MENU_TRIGGER) == trigger;
+	if (ak_fake_prop_of(v, AK_PROP_MENU) == NULL || ak_fake_int(v, AK_PROP_MENU_TRIGGER) != trigger) return false;
+	ak_action_vec items = {0};
+	ak_fake_action_items(v, AK_PROP_MENU, &items);
+	bool any = items.len > 0;
+	ak_vec_free(&items);
+	return any;
 }
 
 // pressable is the view a touch on v goes to: v or the nearest around it
@@ -1299,7 +1306,9 @@ static bool press(ak_uitest *a, ak_fake_view *v, ak_span text, bool long_press, 
 		focus(a, p);
 	} else if (p->kind == AK_KIND_TOGGLE) {
 		ak_fake_flip(a->f, p);
-	} else if (has_menu(p, AK_MENU_TRIGGER_TAP) && !ak_fake_listens(p, AK_EVENT_PRESS)) {
+	} else if (has_menu(p, AK_MENU_TRIGGER_TAP) && (p->kind == AK_KIND_BUTTON || !ak_fake_listens(p, AK_EVENT_PRESS))) {
+		// A button's menu shows instead of its press, as every host's does;
+		// a view's tap menu only when nothing else takes the press.
 		open_menu(a, p, AK_PROP_MENU, 0, -1);
 	} else if (p->kind == AK_FAKE_KIND_CELL) {
 		ak_fake_view *list = NULL;
